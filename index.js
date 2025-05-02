@@ -36,15 +36,12 @@ app.get('/api/notes', (req, res) => {
   });
 });
 
-app.get('/api/notes/:id', (req, res) => {
+app.get('/api/notes/:id', (req, res, next) => {
   Note.findById(request.params.id)
     .then((note) => {
       response.json(note);
     })
-    .catch((error) => {
-      console.log(error);
-      res.status(500).end();
-    });
+    .catch((error) => next(error));
 });
 
 app.delete('/api/notes/:id', (req, res) => {
@@ -84,6 +81,12 @@ app.post('/api/notes', (req, res) => {
     res.json(savedNote);
   });
 });
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' });
+};
+
+app.use(unknownEndpoint);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
